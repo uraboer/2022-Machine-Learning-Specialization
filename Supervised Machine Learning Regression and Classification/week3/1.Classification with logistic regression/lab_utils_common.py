@@ -35,9 +35,7 @@ def sigmoid(z):
          sigmoid(z)
     """
     z = np.clip( z, -500, 500 )           # protect against overflow
-    g = 1.0/(1.0+np.exp(-z))
-
-    return g
+    return 1.0/(1.0+np.exp(-z))
 
 ##########################################################
 # Regression Routines
@@ -133,9 +131,7 @@ def compute_cost_matrix(X, y, w, b, logistic=False, lambda_=0, safe=True):
 
     reg_cost = (lambda_/(2*m)) * np.sum(w**2)                                   # scalar
 
-    total_cost = cost + reg_cost                                                # scalar
-
-    return total_cost                                                           # scalar
+    return cost + reg_cost
 
 def compute_gradient_matrix(X, y, w, b, logistic=False, lambda_=0):
     """
@@ -205,9 +201,8 @@ def gradient_descent(X, y, w_in, b_in, alpha, num_iters, logistic=False, lambda_
             J_history.append( compute_cost_matrix(X, y, w, b, logistic, lambda_) )
 
         # Print cost every at intervals 10 times or as many iterations if < 10
-        if i% math.ceil(num_iters / 10) == 0:
-            if verbose: print(f"Iteration {i:4d}: Cost {J_history[-1]}   ")
-
+        if i % math.ceil(num_iters / 10) == 0 and verbose:
+            print(f"Iteration {i:4d}: Cost {J_history[-1]}   ")
     return w.reshape(w_in.shape), b, J_history  #return final w,b and J history for graphing
 
 def zscore_normalize_features(X):

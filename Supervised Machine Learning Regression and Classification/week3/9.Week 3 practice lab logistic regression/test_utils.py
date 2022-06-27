@@ -15,11 +15,8 @@ def datatype_check(expected_output, target_output, error):
                                                                                      type(
                                                                                          target_output[key]),
                                                                                      type(expected_output[key])))
-        if success == len(target_output.keys()):
-            return 1
-        else:
-            return 0
-    elif isinstance(target_output, tuple) or isinstance(target_output, list):
+        return 1 if success == len(target_output.keys()) else 0
+    elif isinstance(target_output, (tuple, list)):
         for i in range(len(target_output)):
             try:
                 success += datatype_check(expected_output[i],
@@ -31,11 +28,7 @@ def datatype_check(expected_output, target_output, error):
                                                                                                      target_output[i]),
                                                                                                  type(expected_output[i]
                                                                                                       )))
-        if success == len(target_output):
-            return 1
-        else:
-            return 0
-
+        return 1 if success == len(target_output) else 0
     else:
         assert isinstance(target_output, type(expected_output))
         return 1
@@ -49,24 +42,16 @@ def equation_output_check(expected_output, target_output, error):
                 success += equation_output_check(expected_output[key],
                                                  target_output[key], error)
             except:
-                print("Error: {} for variable {}.".format(error,
-                                                          key))
-        if success == len(target_output.keys()):
-            return 1
-        else:
-            return 0
-    elif isinstance(target_output, tuple) or isinstance(target_output, list):
+                print(f"Error: {error} for variable {key}.")
+        return 1 if success == len(target_output.keys()) else 0
+    elif isinstance(target_output, (tuple, list)):
         for i in range(len(target_output)):
             try:
                 success += equation_output_check(expected_output[i],
                                                  target_output[i], error)
             except:
-                print("Error: {} for variable in position {}.".format(error, i))
-        if success == len(target_output):
-            return 1
-        else:
-            return 0
-
+                print(f"Error: {error} for variable in position {i}.")
+        return 1 if success == len(target_output) else 0
     else:
         if hasattr(target_output, 'shape'):
             np.testing.assert_array_almost_equal(
@@ -84,23 +69,16 @@ def shape_check(expected_output, target_output, error):
                 success += shape_check(expected_output[key],
                                        target_output[key], error)
             except:
-                print("Error: {} for variable {}.".format(error, key))
-        if success == len(target_output.keys()):
-            return 1
-        else:
-            return 0
-    elif isinstance(target_output, tuple) or isinstance(target_output, list):
+                print(f"Error: {error} for variable {key}.")
+        return 1 if success == len(target_output.keys()) else 0
+    elif isinstance(target_output, (tuple, list)):
         for i in range(len(target_output)):
             try:
                 success += shape_check(expected_output[i],
                                        target_output[i], error)
             except:
-                print("Error: {} for variable {}.".format(error, i))
-        if success == len(target_output):
-            return 1
-        else:
-            return 0
-
+                print(f"Error: {error} for variable {i}.")
+        return 1 if success == len(target_output) else 0
     else:
         if hasattr(target_output, 'shape'):
             assert target_output.shape == expected_output.shape
@@ -132,7 +110,8 @@ def single_test(test_cases, target):
         print('\033[92m', success, " Tests passed")
         print('\033[91m', len(test_cases) - success, " Tests failed")
         raise AssertionError(
-            "Not all tests were passed for {}. Check your equations and avoid using global variables inside the function.".format(target.__name__))
+            f"Not all tests were passed for {target.__name__}. Check your equations and avoid using global variables inside the function."
+        )
 
 
 def multiple_test(test_cases, target):
@@ -159,5 +138,6 @@ def multiple_test(test_cases, target):
         print('\033[92m', success, " Tests passed")
         print('\033[91m', len(test_cases) - success, " Tests failed")
         raise AssertionError(
-            "Not all tests were passed for {}. Check your equations and avoid using global variables inside the function.".format(target.__name__))
+            f"Not all tests were passed for {target.__name__}. Check your equations and avoid using global variables inside the function."
+        )
 

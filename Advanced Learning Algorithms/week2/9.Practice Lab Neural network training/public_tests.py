@@ -21,7 +21,7 @@ def test_my_softmax(target):
     
 def test_model(target, classes, input_size):
     target.build(input_shape=(None,input_size))
-    
+
     assert len(target.layers) == 3, \
         f"Wrong number of layers. Expected 3 but got {len(target.layers)}"
     assert target.input.shape.as_list() == [None, input_size], \

@@ -33,7 +33,7 @@ def gen_data(m, seed=1, scale=0.7):
     y_ideal = x_train**2 + c
     y_train = y_ideal + scale * y_ideal*(np.random.sample((m,))-0.5)
     x_ideal = x_train #for redraw when new data included in X
-    return x_train, y_train, x_ideal, y_ideal
+    return x_ideal, y_train, x_ideal, y_ideal
 
 def gen_blobs():
     classes = 6
@@ -61,12 +61,10 @@ class lin_model:
     def predict(self, X):
         X_mapped = self.poly.transform(X.reshape(-1,1))
         X_mapped_scaled = self.scaler.transform(X_mapped)
-        yhat = self.linear_model.predict(X_mapped_scaled)
-        return(yhat)
+        return self.linear_model.predict(X_mapped_scaled)
     
     def mse(self, y, yhat):
-        err = mean_squared_error(y,yhat)/2   #sklean doesn't have div by 2
-        return (err)
+        return mean_squared_error(y,yhat)/2
      
 def plt_train_test(X_train, y_train, X_test, y_test, x, y_pred, x_ideal, y_ideal, degree):
     fig, ax = plt.subplots(1,1, figsize=(4,4))
@@ -103,14 +101,30 @@ def plt_optimal_degree(X_train, y_train, X_cv, y_cv, x, y_pred, x_ideal, y_ideal
     ax[0].scatter(X_cv, y_cv,       color = dlc["dlorange"], label="cv")
     ax[0].set_xlim(ax[0].get_xlim())
     ax[0].set_ylim(ax[0].get_ylim())
-    for i in range(0,max_degree):
+    for i in range(max_degree):
         ax[0].plot(x, y_pred[:,i],  lw=0.5, label=f"{i+1}")
     ax[0].legend(loc='upper left')
 
     ax[1].set_title("error vs degree",fontsize = 12)
     cpts = list(range(1, max_degree+1))
-    ax[1].plot(cpts, err_train[0:], marker='o',label="train error", lw=2,  color = dlc["dlblue"])
-    ax[1].plot(cpts, err_cv[0:],    marker='o',label="cv error",  lw=2, color = dlc["dlorange"])
+    ax[1].plot(
+        cpts,
+        err_train[:],
+        marker='o',
+        label="train error",
+        lw=2,
+        color=dlc["dlblue"],
+    )
+
+    ax[1].plot(
+        cpts,
+        err_cv[:],
+        marker='o',
+        label="cv error",
+        lw=2,
+        color=dlc["dlorange"],
+    )
+
     ax[1].set_ylim(*ax[1].get_ylim())
     ax[1].axvline(optimal_degree, lw=1, color = dlc["dlmagenta"])
     ax[1].annotate("optimal degree", xy=(optimal_degree,80000),xycoords='data',
@@ -171,7 +185,7 @@ def tune_m():
     err_train = np.zeros(num_steps)     
     err_cv = np.zeros(num_steps)        
     y_pred = np.zeros((100,num_steps))     
-    
+
     for i in range(num_steps):
         X, y, y_ideal, x_ideal = gen_data(m_range[i],5,0.7)
         x = np.linspace(0,int(X.max()),100)  
@@ -188,7 +202,7 @@ def tune_m():
     return(X_train, y_train, X_cv, y_cv, x, y_pred, err_train, err_cv, m_range,degree)
 
 def plt_tune_m(X_train, y_train, X_cv, y_cv, x, y_pred, err_train, err_cv, m_range, degree):
-    
+
     fig, ax = plt.subplots(1,2,figsize=(8,4))
     fig.canvas.toolbar_visible = False
     fig.canvas.header_visible = False
@@ -228,7 +242,7 @@ def plt_mc_data(ax, X, y, classes,  class_labels=None, map=plt.cm.Paired, legend
     for i in range(classes):
         idx = np.where(y == i)
         col = len(idx[0])*[i]
-        label = class_labels[i] if class_labels else "c{}".format(i)
+        label = class_labels[i] if class_labels else f"c{i}"
         ax.scatter(X[idx, 0], X[idx, 1],  marker=m,
                     c=col, vmin=0, vmax=map.N, cmap=map,
                     s=size, label=label)
@@ -333,12 +347,8 @@ def eval_cat_err(y, yhat):
       err: (scalar)             
     """
     m = len(y)
-    incorrect = 0
-    for i in range(m):
-        if yhat[i] != y[i]:
-            incorrect += 1
-    err = incorrect/m
-    return(err)
+    incorrect = sum(yhat[i] != y[i] for i in range(m))
+    return incorrect/m
 
 def plot_iterate(lambdas, models, X_train, y_train, X_cv, y_cv):
     err_train = np.zeros(len(lambdas))
@@ -372,8 +382,7 @@ def err_all_equal(X_train,X_cv,X_test, y_train,y_cv,y_test, centers):
     y_eq  = np.zeros(m)
     for i in range(m):
         y_eq[i] = recat(X_all[i], centers)
-    err_all = eval_cat_err(y_all, y_eq)
-    return(err_all)
+    return eval_cat_err(y_all, y_eq)
 
 def plt_compare(X,y, classes, simple, regularized, centers):
     plt.close("all")
@@ -381,19 +390,16 @@ def plt_compare(X,y, classes, simple, regularized, centers):
     fig.canvas.toolbar_visible = False
     fig.canvas.header_visible = False
     fig.canvas.footer_visible = False
-
   #plt simple   
     plot_cat_decision_boundary(ax[0], X, simple,  vector=True)
     ax[0].set_title("Simple Model", fontsize=14)
     plt_mc_data(ax[0], X,y, classes, map=dkcolors_map, legend=True, size=75)
     ax[0].set_xlabel('x0') ; ax[0].set_ylabel("x1");
-
   #plt regularized   
     plot_cat_decision_boundary(ax[1], X, regularized,  vector=True)
     ax[1].set_title("Regularized Model", fontsize=14)
     plt_mc_data(ax[1], X,y, classes, map=dkcolors_map, legend=True, size=75)
     ax[1].set_xlabel('x0') ; ax[0].set_ylabel("x1");
-
   #plt ideal
     cat_predict = lambda pt: recat(pt.reshape(1,2), centers)
     plot_cat_decision_boundary(ax[2], X, cat_predict,  vector=False)

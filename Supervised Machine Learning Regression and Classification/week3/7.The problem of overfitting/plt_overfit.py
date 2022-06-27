@@ -16,12 +16,10 @@ def map_one_feature(X1, degree):
     X1 = np.atleast_1d(X1)
     out = []
     string = ""
-    k = 0
-    for i in range(1, degree+1):
+    for k, i in enumerate(range(1, degree+1)):
         out.append((X1**i))
-        string = string + f"w_{{{k}}}{munge('x_0',i)} + "
-        k += 1
-    string = string + ' b' #add b to text equation, not to data
+        string = f"{string}w_{{{k}}}{munge('x_0', i)} + "
+    string = f'{string} b'
     return np.stack(out, axis=1), string
 
 
@@ -38,17 +36,17 @@ def map_feature(X1, X2, degree):
     for i in range(1, degree+1):
         for j in range(i + 1):
             out.append((X1**(i-j) * (X2**j)))
-            string = string + f"w_{{{k}}}{munge('x_0',i-j)}{munge('x_1',j)} + "
+            string = f"{string}w_{{{k}}}{munge('x_0', i-j)}{munge('x_1', j)} + "
             k += 1
     #print(string + 'b')
-    return np.stack(out, axis=1), string + ' b'
+    return np.stack(out, axis=1), f'{string} b'
 
 def munge(base, exp):
     if exp == 0:
         return ''
     if exp == 1:
         return base
-    return base + f'^{{{exp}}}'
+    return f'{base}^{{{exp}}}'
 
 def plot_decision_boundary(ax, x0r,x1r, predict,  w, b, scaler = False, mu=None, sigma=None, degree=None):
     """
@@ -75,8 +73,7 @@ def plot_decision_boundary(ax, x0r,x1r, predict,  w, b, scaler = False, mu=None,
 
     # Put the result into a color plot
     Z = Z.reshape(xx.shape)
-    contour = ax.contour(xx, yy, Z, levels = [0.5], colors='g')
-    return contour
+    return ax.contour(xx, yy, Z, levels = [0.5], colors='g')
 
 # use this to test the above routine
 def plot_decision_boundary_sklearn(x0r, x1r, predict, degree,  scaler = False):
@@ -375,13 +372,11 @@ class overfit_example():
     def update_equation(self, idx, firsttime=False):
         #print(f"Update equation, index = {idx}, firsttime={firsttime}")
         self.degree = idx+1
-        if firsttime:
-            self.eqtext = []
-        else:
+        if not firsttime:
             for artist in self.eqtext:
                 #print(artist)
                 artist.remove()
-            self.eqtext = []
+        self.eqtext = []
         if self.logistic:
             _, equation =  map_feature(self.X[:, 0], self.X[:, 1], self.degree)
             string = 'f_{wb} = sigmoid('
@@ -396,7 +391,7 @@ class overfit_example():
                 string = string +  '+'.join(seq[bz*i:bz*i+bz])
             else:
                 string = '+'.join(seq[bz*i:bz*i+bz])
-            string = string + ')' if i == blks-1 else string + '+'
+            string = f'{string})' if i == blks-1 else f'{string}+'
             ei = self.ax[1].text(0.01,(0.75-i*0.25), f"${string}$",fontsize=9,
                                  transform = self.ax[1].transAxes, ma='left', va='top' )
             self.eqtext.append(ei)

@@ -20,15 +20,14 @@ def map_feature(X1, X2):
     degree = 6
     out = []
     for i in range(1, degree+1):
-        for j in range(i + 1):
-            out.append((X1**(i-j) * (X2**j)))
+        out.extend(X1**(i-j) * (X2**j) for j in range(i + 1))
     return np.stack(out, axis=1)
 
 
 def plot_data(X, y, pos_label="y=1", neg_label="y=0"):
     positive = y == 1
     negative = y == 0
-    
+
     # Plot examples
     plt.plot(X[positive, 0], X[positive, 1], 'k+', label=pos_label)
     plt.plot(X[negative, 0], X[negative, 1], 'yo', label=neg_label)

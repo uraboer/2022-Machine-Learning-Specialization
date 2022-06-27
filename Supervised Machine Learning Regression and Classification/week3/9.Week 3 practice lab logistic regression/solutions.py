@@ -14,13 +14,9 @@ def sigmoid(z):
      g : array_like 
          sigmoid(z)
     """
-    # (≈ 1 line of code)
-    # s = 
-    ### START CODE HERE ### (≈ 1 line of code)
-    s = 1/(1 + np.exp(-z))
     ### END CODE HERE ###
-    
-    return s
+
+    return 1/(1 + np.exp(-z))
 
 
 def compute_cost(X, y, w, b): 
@@ -126,7 +122,7 @@ def compute_cost_reg(X, y, w, b, lambda_=1):
     """
     # number of training examples
     m = X.shape[0]
-    
+
     # You need to return the following variables correctly
     cost = 0
 
@@ -163,7 +159,7 @@ def compute_gradient_reg(X, y, w, b, lambda_=1):
     """
     # number of training examples
     m = X.shape[0]
-    
+
     # You need to return the following variables correctly
     cost = 0
     dw = np.zeros_like(w)
@@ -173,7 +169,7 @@ def compute_gradient_reg(X, y, w, b, lambda_=1):
     dw = (1/m)*np.dot(X.T, err)
     dw += (lambda_/m)  * w
     db = (1/m) * np.sum(err)
- 
+
     #print(db,dw)
 
     return db,dw

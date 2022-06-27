@@ -57,7 +57,7 @@ def test_eval_cat_err(target):
 def model_test(target, classes, input_size):
     target.build(input_shape=(None,input_size))
     expected_lr = 0.01
-    
+
     assert len(target.layers) == 3, \
         f"Wrong number of layers. Expected 3 but got {len(target.layers)}"
     assert target.input.shape.as_list() == [None, input_size], \
@@ -74,21 +74,27 @@ def model_test(target, classes, input_size):
             f"Wrong number of units in layer {i}. Expected {expected[i][1]} but got {layer.output.shape.as_list()}"
         assert layer.activation == expected[i][2], \
             f"Wrong activation in layer {i}. Expected {expected[i][2]} but got {layer.activation}"
-        assert layer.kernel_regularizer == None, "You must not specify any regularizer for any layer"
+        assert (
+            layer.kernel_regularizer is None
+        ), "You must not specify any regularizer for any layer"
+
         i = i + 1
-        
+
     assert type(target.loss)==SparseCategoricalCrossentropy, f"Wrong loss function. Expected {SparseCategoricalCrossentropy}, but got {target.loss}"
     assert type(target.optimizer)==Adam, f"Wrong loss function. Expected {Adam}, but got {target.optimizer}"
     lr = target.optimizer.learning_rate.numpy()
     assert np.isclose(lr, expected_lr, atol=1e-8), f"Wrong learning rate. Expected {expected_lr}, but got {lr}"
-    assert target.loss.get_config()['from_logits'], f"Set from_logits=True in loss function"
+    assert target.loss.get_config()[
+        'from_logits'
+    ], "Set from_logits=True in loss function"
+
 
     print("\033[92mAll tests passed!")
     
 def model_s_test(target, classes, input_size):
     target.build(input_shape=(None,input_size))
     expected_lr = 0.01
-    
+
     assert len(target.layers) == 2, \
         f"Wrong number of layers. Expected 3 but got {len(target.layers)}"
     assert target.input.shape.as_list() == [None, input_size], \
@@ -104,14 +110,20 @@ def model_s_test(target, classes, input_size):
             f"Wrong number of units in layer {i}. Expected {expected[i][1]} but got {layer.output.shape.as_list()}"
         assert layer.activation == expected[i][2], \
             f"Wrong activation in layer {i}. Expected {expected[i][2]} but got {layer.activation}"
-        assert layer.kernel_regularizer == None, "You must not specify any regularizer any layer"
+        assert (
+            layer.kernel_regularizer is None
+        ), "You must not specify any regularizer any layer"
+
         i = i + 1
-        
+
     assert type(target.loss)==SparseCategoricalCrossentropy, f"Wrong loss function. Expected {SparseCategoricalCrossentropy}, but got {target.loss}"
     assert type(target.optimizer)==Adam, f"Wrong loss function. Expected {Adam}, but got {target.optimizer}"
     lr = target.optimizer.learning_rate.numpy()
     assert np.isclose(lr, expected_lr, atol=1e-8), f"Wrong learning rate. Expected {expected_lr}, but got {lr}"
-    assert target.loss.get_config()['from_logits'], f"Set from_logits=True in loss function"
+    assert target.loss.get_config()[
+        'from_logits'
+    ], "Set from_logits=True in loss function"
+
 
     print("\033[92mAll tests passed!")
     
@@ -135,17 +147,23 @@ def model_r_test(target, classes, input_size):
             f"Wrong number of units in layer {i}. Expected {expected[i][1]} but got {layer.output.shape.as_list()}"
         assert layer.activation == expected[i][2], \
             f"Wrong activation in layer {i}. Expected {expected[i][2]} but got {layer.activation}"
-        if not (expected[i][3] == None):
+        if expected[i][3] is not None:
             assert type(layer.kernel_regularizer) == expected[i][3][0], f"Wrong regularizer. Expected L2 regularizer but got {type(layer.kernel_regularizer)}"
             assert np.isclose(layer.kernel_regularizer.l2,  expected[i][3][1]), f"Wrong regularization factor. Expected {expected[i][3][1]}, but got {layer.kernel_regularizer.l2}"
         else:
-            assert layer.kernel_regularizer == None, "You must not specify any regularizer for the 3th layer"
+            assert (
+                layer.kernel_regularizer is None
+            ), "You must not specify any regularizer for the 3th layer"
+
         i = i + 1
-        
+
     assert type(target.loss)==SparseCategoricalCrossentropy, f"Wrong loss function. Expected {SparseCategoricalCrossentropy}, but got {target.loss}"
     assert type(target.optimizer)==Adam, f"Wrong loss function. Expected {Adam}, but got {target.optimizer}"
     lr = target.optimizer.learning_rate.numpy()
     assert np.isclose(lr, expected_lr, atol=1e-8), f"Wrong learning rate. Expected {expected_lr}, but got {lr}"
-    assert target.loss.get_config()['from_logits'], f"Set from_logits=True in loss function"
+    assert target.loss.get_config()[
+        'from_logits'
+    ], "Set from_logits=True in loss function"
+
 
     print("\033[92mAll tests passed!")
