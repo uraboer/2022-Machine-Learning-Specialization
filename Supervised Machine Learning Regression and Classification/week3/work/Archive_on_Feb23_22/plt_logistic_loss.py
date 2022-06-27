@@ -29,7 +29,7 @@ def plt_logistic_squared_error(X,y):
                          np.linspace(10, -20, 40))
     points = np.c_[wx.ravel(), by.ravel()]
     cost = np.zeros(points.shape[0])
-    
+
     for i in range(points.shape[0]):
         w,b = points[i]
         cost[i] = compute_cost_logistic_sq_err(X.reshape(-1,1), y, w, b)
@@ -57,7 +57,7 @@ def plt_logistic_cost(X,y):
                          np.linspace(0, -20, 40))
     points = np.c_[wx.ravel(), by.ravel()]
     cost = np.zeros(points.shape[0],dtype=np.longdouble)
-    
+
     for i in range(points.shape[0]):
         w,b = points[i]
         cost[i] = compute_cost_logistic(X.reshape(-1,1), y, w, b, safe=True)
@@ -77,9 +77,9 @@ def plt_logistic_cost(X,y):
     ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     ax.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
-    
+
     ax = fig.add_subplot(1, 2, 2, projection='3d')
-    
+
     ax.plot_surface(wx, by, np.log(cost), alpha=0.6,cmap=cm.jet,)
 
     ax.set_xlabel('w', fontsize=16)
@@ -115,14 +115,9 @@ def soup_bowl():
 
     #Get the z value for a bowl-shaped cost function
     z=np.zeros((len(w), len(b)))
-    j=0
-    for x in w:
-        i=0
-        for y in b:
+    for j, x in enumerate(w):
+        for i, y in enumerate(b):
             z[i,j] = x**2 + y**2
-            i+=1
-        j+=1
-
     #Meshgrid used for plotting 3D functions
     W, B = np.meshgrid(w, b)
 

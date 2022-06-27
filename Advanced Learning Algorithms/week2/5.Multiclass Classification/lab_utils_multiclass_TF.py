@@ -52,7 +52,7 @@ def plot_cat_decision_boundary_mc(ax, X, predict , class_labels=None, legend=Fal
 def plot_mc_data(X, y, class_labels=None, legend=False,size=40):
     classes = np.unique(y)
     for i in classes:
-        label = class_labels[i] if class_labels else "class {}".format(i)
+        label = class_labels[i] if class_labels else f"class {i}"
         idx = np.where(y == i)
         plt.scatter(X[idx, 0], X[idx, 1],  cmap=plt.cm.Paired,
                     edgecolor='black', s=size, label=label)
@@ -64,7 +64,7 @@ def plt_mc_data(ax, X, y, classes,  class_labels=None, map=plt.cm.Paired,
     for i in range(classes):
         idx = np.where(y == i)
         col = len(idx[0])*[i]
-        label = class_labels[i] if class_labels else "c{}".format(i)
+        label = class_labels[i] if class_labels else f"c{i}"
         #ax.scatter(X[idx, 0], X[idx, 1],  marker=m,
         #            c=col, vmin=0, vmax=map.N, cmap=map,
         #            s=size, label=label)
@@ -97,7 +97,7 @@ def plt_cat_mc(X_train, y_train, model, classes):
     fig.canvas.toolbar_visible = False
     fig.canvas.header_visible = False
     fig.canvas.footer_visible = False
- 
+
     #add the original data to the decison boundary
     plt_mc_data(ax, X_train,y_train, classes, map=dkcolors_map, legend=True)
     #plot the decison boundary. 
@@ -141,10 +141,10 @@ def plt_prob_z(ax,fwb, x0_rng=(-8,8), x1_rng=(-5,4)):
 
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     """ truncates color map """
-    new_cmap = colors.LinearSegmentedColormap.from_list(
+    return colors.LinearSegmentedColormap.from_list(
         'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
-        cmap(np.linspace(minval, maxval, n)))
-    return new_cmap
+        cmap(np.linspace(minval, maxval, n)),
+    )
 
 
 def plt_layer_relu(X, Y, W1, b1, classes):

@@ -37,7 +37,7 @@ class plt_one_addpt_onclick:
 
         axcalc   = plt.axes([0.1, 0.05, 0.35, 0.075])  #l,b,w,h
         axthresh = plt.axes([0.5, 0.05, 0.35, 0.075])  #l,b,w,h
-        
+
         self.fig = fig
         self.ax = [ax,axcalc,axthresh]
         self.x = x
@@ -50,7 +50,7 @@ class plt_one_addpt_onclick:
             self.bline = self.ax[0].plot(self.x, f_wb, color=dlorange,lw=1)
         else:
             self.aline = self.ax[0].plot(self.x, sigmoid(f_wb), color=dlblue)
-            
+
 
         self.cid = fig.canvas.mpl_connect('button_press_event', self.add_data)
         if self.logistic:
@@ -69,7 +69,7 @@ class plt_one_addpt_onclick:
         if event.inaxes == self.ax[0]:
             x_coord = event.xdata
             y_coord = event.ydata
-            
+
             if y_coord > 0.5:
                 self.ax[0].scatter(x_coord, 1, marker='x', s=80, c = 'red', label="y=1")
                 self.y = np.append(self.y,1)
@@ -111,8 +111,10 @@ class plt_one_addpt_onclick:
             xlim  = self.ax[0].get_xlim()
             x_hat = np.linspace(*xlim, 30)
             y_hat = sigmoid(np.matmul(x_hat.reshape(-1,1), self.w) + self.b)
-            self.aline = self.ax[0].plot(x_hat, y_hat, color=dlblue, 
-                                         label=f"y = sigmoid(z)")
+            self.aline = self.ax[0].plot(
+                x_hat, y_hat, color=dlblue, label="y = sigmoid(z)"
+            )
+
             f_wb = np.matmul(x_hat.reshape(-1,1), self.w) + self.b
             self.bline = self.ax[0].plot(x_hat, f_wb, color=dlorange, lw=1, 
                                          label=f"z = {np.squeeze(self.w):0.2f}x+({self.b:0.2f})")

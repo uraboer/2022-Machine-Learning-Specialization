@@ -33,7 +33,7 @@ class plt_quad_logistic:
         self.ax = ax
         self.x_train = x_train
         self.y_train = y_train
-    
+
         self.w = 0. #initial point, non-array
         self.b = 0.   
 
@@ -41,7 +41,7 @@ class plt_quad_logistic:
         self.dplot = data_plot(ax[0], x_train, y_train, self.w, self.b)
         self.con_plot = contour_and_surface_plot(ax[1], ax[2], x_train, y_train, w_range, b_range, self.w, self.b)
         self.cplot = cost_plot(ax[3])
-        
+
         # setup events
         self.cid = fig.canvas.mpl_connect('button_press_event', self.click_contour)
         self.bcalc = Button(axcalc, 'Run Gradient Descent \nfrom current w,b (click)', color=dlorange)
@@ -53,7 +53,7 @@ class plt_quad_logistic:
         if event.inaxes == self.ax[1]:   #contour plot
             self.w = event.xdata
             self.b = event.ydata
-            
+
             self.cplot.re_init()
             self.dplot.update(self.w, self.b)
             self.con_plot.update_contour_wb_lines(self.w, self.b)
@@ -115,12 +115,11 @@ class data_plot:
             self.aline[0].remove()
             self.bline[0].remove()
             self.alegend.remove()
-            
+
         xlim  = self.ax.get_xlim()
         x_hat = np.linspace(*xlim, 30)
         y_hat = sigmoid(np.dot(x_hat.reshape(-1,1), self.w) + self.b)
-        self.aline = self.ax.plot(x_hat, y_hat, color=dlblue, 
-                                     label=f"y = sigmoid(z)")
+        self.aline = self.ax.plot(x_hat, y_hat, color=dlblue, label="y = sigmoid(z)")
         f_wb = np.dot(x_hat.reshape(-1,1), self.w) + self.b
         self.bline = self.ax.plot(x_hat, f_wb, color=dlorange, lw=1, 
                                      label=f"z = {np.squeeze(self.w):0.2f}x+({self.b:0.2f})")
@@ -152,7 +151,7 @@ class data_plot:
             ctot += c_p
             self.cost_items.extend((a,b))
         ctot = ctot/(len(self.x_train))
-        cstr = cstr[:-1] + f") = {ctot:0.2f}"
+        cstr = f"{cstr[:-1]}) = {ctot:0.2f}"
         ## todo.. figure out how to get this textbox to extend to the width of the subplot
         c = self.ax.text(0.05,0.02,cstr, transform=self.ax.transAxes, color=dlpurple)
         self.cost_items.append(c)
@@ -276,10 +275,10 @@ from matplotlib import cm
 import matplotlib.colors as colors
 
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
-    new_cmap = colors.LinearSegmentedColormap.from_list(
+    return colors.LinearSegmentedColormap.from_list(
         'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
-        cmap(np.linspace(minval, maxval, n)))
-    return new_cmap
+        cmap(np.linspace(minval, maxval, n)),
+    )
 
 def plt_prob(ax, w_out,b_out):
     #setup useful ranges and common linspaces

@@ -117,14 +117,9 @@ def soup_bowl():
 
     #Get the z value for a bowl-shaped cost function
     z=np.zeros((len(w), len(b)))
-    j=0
-    for x in w:
-        i=0
-        for y in b:
+    for j, x in enumerate(w):
+        for i, y in enumerate(b):
             z[i,j] = x**2 + y**2
-            i+=1
-        j+=1
-
     #Meshgrid used for plotting 3D functions
     W, B = np.meshgrid(w, b)
 

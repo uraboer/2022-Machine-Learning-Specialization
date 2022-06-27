@@ -3,8 +3,8 @@ import numpy as np
 def load_data():
     X = np.load("data/X.npy")
     y = np.load("data/y.npy")
-    X = X[0:1000]
-    y = y[0:1000]
+    X = X[:1000]
+    y = y[:1000]
     return X, y
 
 def load_weights():

@@ -38,9 +38,7 @@ def sigmoid(z):
          sigmoid(z)
     """
     z = np.clip( z, -500, 500 )           # protect against overflow
-    g = 1.0/(1.0+np.exp(-z))
-    
-    return g
+    return 1.0/(1.0+np.exp(-z))
 
 ##########################################################
 # Regression Routines
@@ -82,7 +80,7 @@ def compute_cost_logistic(X, y, w, b, lambda_=0, safe=False):
         for j in range(n):
             reg_cost += (w[j]**2)                                               # scalar
         reg_cost = (lambda_/(2*m))*reg_cost
-    
+
     return cost + reg_cost
 
 def compute_cost_linear_matrix(X, y, w, b, verbose=False):
@@ -225,9 +223,7 @@ def compute_cost_matrix(X, y, w, b, logistic=False, lambda_=0, safe=True):
 
     reg_cost = (lambda_/(2*m)) * np.sum(w**2)                                   # scalar
 
-    total_cost = cost + reg_cost                                                # scalar
-
-    return total_cost                                                           # scalar
+    return cost + reg_cost
 
 def compute_gradient_matrix(X, y, w, b, logistic=False, lambda_=0): 
     """
@@ -258,7 +254,7 @@ def compute_gradient_matrix(X, y, w, b, logistic=False, lambda_=0):
 
     return dj_db, dj_dw                                           # scalar, (n,1)
 
-def gradient_descent(X, y, w_in, b_in, alpha, num_iters, logistic=False, lambda_=0, verbose=True): 
+def gradient_descent(X, y, w_in, b_in, alpha, num_iters, logistic=False, lambda_=0, verbose=True):
     """
     Performs batch gradient descent to learn theta. Updates theta by taking 
     num_iters gradient steps with learning rate alpha
@@ -280,7 +276,7 @@ def gradient_descent(X, y, w_in, b_in, alpha, num_iters, logistic=False, lambda_
     """
     # number of training examples
     m = len(X)
-    
+
     # An array to store cost J and w's at each iteration primarily for graphing later
     J_history = []
     w = copy.deepcopy(w_in)  #avoid modifying global w within function
@@ -294,20 +290,19 @@ def gradient_descent(X, y, w_in, b_in, alpha, num_iters, logistic=False, lambda_
         dj_db,dj_dw = compute_gradient_matrix(X, y, w, b, logistic, lambda_)   
 
         # Update Parameters using w, b, alpha and gradient
-        w = w - alpha * dj_dw               
+        w = w - alpha * dj_dw
         b = b - alpha * dj_db               
-      
+
         # Save cost J at each iteration
         if i<100000:      # prevent resource exhaustion 
             J_history.append( compute_cost_matrix(X, y, w, b, logistic, lambda_) )
 
         # Print cost every at intervals 10 times or as many iterations if < 10
-        if i% math.ceil(num_iters / 10) == 0:
-            if verbose: print(f"Iteration {i:4d}: Cost {J_history[-1]}   ")
-        
+        if i % math.ceil(num_iters / 10) == 0 and verbose:
+            print(f"Iteration {i:4d}: Cost {J_history[-1]}   ")
     return w.reshape(w_in.shape), b, J_history, #return final w,b and J history for graphing
 
-def oldgradient_descent(X, y, w_in, b_in, alpha, num_iters,cost_function, gradient_function, verbose=True): 
+def oldgradient_descent(X, y, w_in, b_in, alpha, num_iters,cost_function, gradient_function, verbose=True):
     """
     Performs batch gradient descent to learn theta. Updates theta by taking 
     num_iters gradient steps with learning rate alpha
@@ -330,7 +325,7 @@ def oldgradient_descent(X, y, w_in, b_in, alpha, num_iters,cost_function, gradie
     """
     # number of training examples
     m = len(X)
-    
+
     # An array to store cost J and w's at each iteration primarily for graphing later
     J_history = []
     w = copy.deepcopy(w_in)  #avoid modifying global w within function
@@ -341,17 +336,16 @@ def oldgradient_descent(X, y, w_in, b_in, alpha, num_iters,cost_function, gradie
         dj_db,dj_dw = gradient_function(X, y, w, b)   
 
         # Update Parameters using w, b, alpha and gradient
-        w = w - alpha * dj_dw               
+        w = w - alpha * dj_dw
         b = b - alpha * dj_db               
-      
+
         # Save cost J at each iteration
         if i<100000:      # prevent resource exhaustion 
             J_history.append( cost_function(X, y, w, b))
 
         # Print cost every at intervals 10 times or as many iterations if < 10
-        if i% math.ceil(num_iters / 10) == 0:
-            if verbose: print(f"Iteration {i:4d}: Cost {J_history[-1]}   ")
-        
+        if i % math.ceil(num_iters / 10) == 0 and verbose:
+            print(f"Iteration {i:4d}: Cost {J_history[-1]}   ")
     return w, b, J_history, #return final w,b and J history for graphing
 
 def zscore_normalize_features(X):
@@ -385,7 +379,7 @@ def zscore_normalize_features(X):
 
 
 def plot_data(X, y, ax, pos_label="y=1", neg_label="y=0", s=80, loc='best' ):
-    
+
     # Find Indices of Positive and Negative Examples
     pos = y == 1
     neg = y == 0
@@ -396,7 +390,7 @@ def plot_data(X, y, ax, pos_label="y=1", neg_label="y=0", s=80, loc='best' ):
     ax.scatter(X[pos, 0], X[pos, 1], marker='x', s=s, c = 'red', label=pos_label)
     ax.scatter(X[neg, 0], X[neg, 1], marker='o', s=s, label=neg_label, facecolors='none', edgecolors=dlblue, lw=3)
     ax.legend(loc=loc)
-    
+
     ax.figure.canvas.toolbar_visible = False
     ax.figure.canvas.header_visible = False
     ax.figure.canvas.footer_visible = False
@@ -411,7 +405,7 @@ def plt_tumor_data(x, y, ax):
     ax.set_ylabel('y')
     ax.set_xlabel('Tumor Size')
     ax.set_title("Logistic Regression on Categorical Data")
-    
+
     ax.figure.canvas.toolbar_visible = False
     ax.figure.canvas.header_visible = False
     ax.figure.canvas.footer_visible = False

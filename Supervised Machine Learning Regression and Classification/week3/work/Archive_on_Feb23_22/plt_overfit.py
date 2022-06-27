@@ -14,12 +14,10 @@ def map_one_feature(X1, degree):
     X1 = np.atleast_1d(X1)
     out = []
     str = ""
-    k = 0
-    for i in range(1, degree+1):
+    for k, i in enumerate(range(1, degree+1)):
         out.append((X1**i))
-        str = str + f"w_{{{k}}}{munge('x_0',i)} + "
-        k += 1
-    str = str + ' b' #add b to text equation, not to data
+        str = f"{str}w_{{{k}}}{munge('x_0', i)} + "
+    str = f'{str} b'
     return np.stack(out, axis=1), str 
 
 
@@ -36,10 +34,10 @@ def map_feature(X1, X2, degree):
     for i in range(1, degree+1):
         for j in range(i + 1):
             out.append((X1**(i-j) * (X2**j)))
-            str = str + f"w_{{{k}}}{munge('x_0',i-j)}{munge('x_1',j)} + "
+            str = f"{str}w_{{{k}}}{munge('x_0', i-j)}{munge('x_1', j)} + "
             k += 1
     #print(str + 'b')
-    return np.stack(out, axis=1), str+' b'
+    return np.stack(out, axis=1), f'{str} b'
 
 def munge(base,exp):
     if exp == 0:
@@ -47,7 +45,7 @@ def munge(base,exp):
     elif exp == 1:
         return (base)
     else:
-        return (base + f'^{{{exp}}}')
+        return f'{base}^{{{exp}}}'
 
 def plot_decision_boundary(ax, x0r,x1r, y, predict,  w, b, scaler = False, mu=None, sigma=None, degree=None):
     """
@@ -75,8 +73,7 @@ def plot_decision_boundary(ax, x0r,x1r, y, predict,  w, b, scaler = False, mu=No
 
     # Put the result into a color plot
     Z = Z.reshape(xx.shape)
-    contour = ax.contour(xx, yy, Z, levels = [0.5], colors='g')
-    return(contour)
+    return ax.contour(xx, yy, Z, levels = [0.5], colors='g')
 
 
 def plot_decision_boundary_sklearn(x0r,x1r, y,predict,  scaler = False):
@@ -135,7 +132,7 @@ class plt_overfit():
         self.ax = ax
         self.X = X
         self.y = y
-    
+
         self.w = 0. #initial point, non-array
         self.b = 0.   
 

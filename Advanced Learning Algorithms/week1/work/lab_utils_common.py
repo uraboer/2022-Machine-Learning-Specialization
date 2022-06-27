@@ -36,9 +36,7 @@ def sigmoid(z):
          sigmoid(z)
     """
     z = np.clip( z, -500, 500 )           # protect against overflow
-    g = 1.0/(1.0+np.exp(-z))
-
-    return g
+    return 1.0/(1.0+np.exp(-z))
 
 ##########################################################
 # Regression Routines
@@ -134,9 +132,7 @@ def compute_cost_matrix(X, y, w, b, logistic=False, lambda_=0, safe=True):
 
     reg_cost = (lambda_/(2*m)) * np.sum(w**2)                                   # scalar
 
-    total_cost = cost + reg_cost                                                # scalar
-
-    return total_cost                                                           # scalar
+    return cost + reg_cost
 
 def compute_gradient_matrix(X, y, w, b, logistic=False, lambda_=0):
     """

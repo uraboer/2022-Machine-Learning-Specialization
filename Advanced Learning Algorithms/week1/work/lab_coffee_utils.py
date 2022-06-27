@@ -17,16 +17,10 @@ def load_coffee_data():
     X[:,1] = X[:,1] * 4 + 11.5          # 12-15 min is best
     X[:,0] = X[:,0] * (285-150) + 150  # 350-500 F (175-260 C) is best
     Y = np.zeros(len(X))
-    
-    i=0
-    for t,d in X:
-        y = -3/(260-175)*t + 21
-        if (t > 175 and t < 260 and d > 12 and d < 15 and d<=y ):
-            Y[i] = 1
-        else:
-            Y[i] = 0
-        i += 1
 
+    for i, (t, d) in enumerate(X):
+        y = -3/(260-175)*t + 21
+        Y[i] = 1 if (t > 175 and t < 260 and d > 12 and d < 15 and d<=y ) else 0
     return (X, Y.reshape(-1,1))
 
 def plt_roast(X,Y):
@@ -40,7 +34,7 @@ def plt_roast(X,Y):
     ax.plot(tr, (-3/85) * tr + 21, color=dlc["dlpurple"],linewidth=1)
     ax.axhline(y=12,color=dlc["dlpurple"],linewidth=1)
     ax.axvline(x=175,color=dlc["dlpurple"],linewidth=1)
-    ax.set_title(f"Coffee Roasting", size=16)
+    ax.set_title("Coffee Roasting", size=16)
     ax.set_xlabel("Temperature \n(Celsius)",size=12)
     ax.set_ylabel("Duration \n(minutes)",size=12)
     ax.legend(loc='upper right')
@@ -70,10 +64,10 @@ def plt_prob(ax,fwb):
 
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     """ truncates color map """
-    new_cmap = colors.LinearSegmentedColormap.from_list(
+    return colors.LinearSegmentedColormap.from_list(
         'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
-        cmap(np.linspace(minval, maxval, n)))
-    return new_cmap
+        cmap(np.linspace(minval, maxval, n)),
+    )
 
 def plt_layer(X,Y,W1,b1,norm_l):
     Y = Y.reshape(-1,)
@@ -106,7 +100,7 @@ def plt_network(X,Y,netf):
     ax[0].set_xlabel("Temperature \n(Celsius)",size=12)
     ax[0].set_ylabel("Duration \n(minutes)",size=12)
     ax[0].legend(loc='upper right')
-    ax[0].set_title(f"network probability")
+    ax[0].set_title("network probability")
 
     ax[1].plot(X[:,0], (-3/85) * X[:,0] + 21, color=dlc["dlpurple"],linewidth=1)
     ax[1].axhline(y= 12, color=dlc["dlpurple"], linewidth=1)
@@ -116,7 +110,7 @@ def plt_network(X,Y,netf):
     ax[1].scatter(X[yhat[:,0]==1,0],X[yhat[:,0]==1,1], s=70, marker='x', c='orange', label="Predicted Good Roast" )
     ax[1].scatter(X[yhat[:,0]==0,0],X[yhat[:,0]==0,1], s=100, marker='o', facecolors='none', 
                    edgecolors=dlc["dldarkblue"],linewidth=1,  label="Bad Roast")
-    ax[1].set_title(f"network decision")
+    ax[1].set_title("network decision")
     ax[1].set_xlabel("Temperature \n(Celsius)",size=12)
     ax[1].set_ylabel("Duration \n(minutes)",size=12)
     ax[1].legend(loc='upper right')
@@ -139,11 +133,11 @@ def plt_output_unit(W,b):
                 v = np.array([x[i,j,k],y[i,j,k],z[i,j,k]])
                 d[i,j,k] = tf.keras.activations.sigmoid(np.dot(v,W[:,0])+b).numpy()
     pcm = ax.scatter(x, y, z, c=d, cmap=cmap, alpha = 1 )
-    ax.set_xlabel("unit 0"); 
-    ax.set_ylabel("unit 1"); 
-    ax.set_zlabel("unit 2"); 
+    ax.set_xlabel("unit 0");
+    ax.set_ylabel("unit 1");
+    ax.set_zlabel("unit 2");
     ax.view_init(30, -120)
     ax.figure.colorbar(pcm, ax=ax)
-    ax.set_title(f"Layer 2, output unit")
+    ax.set_title("Layer 2, output unit")
 
     plt.show()

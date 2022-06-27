@@ -25,12 +25,10 @@ def sigmoid(z):
      g : array_like 
          sigmoid(z)
     """
-    g = 1.0/(1.0+np.exp(-z))
-    
     #if (g==0): g = 1e-14
     #if (g==1): g = 1- 1e-14
-   
-    return g
+
+    return 1.0/(1.0+np.exp(-z))
 
 
 
@@ -112,10 +110,8 @@ def compute_cost_logistic_matrix(X, y, w, b, verbose=False):
     w = w.reshape(-1,1)             # ensure 2D
     f = sigmoid(X @ w + b)
     total_cost = (1/m)*(np.dot(-y.T, np.log(f)) - np.dot((1-y).T, np.log(1-f)))
-    
-    if verbose: print(f"f_wb: {f_wb}")       
-    return total_cost
 
+    if verbose: print(f"f_wb: {f_wb}")
     return total_cost
     
 
@@ -166,7 +162,7 @@ def gradient_descent(X, y, w_in, b_in, alpha, num_iters,cost_function, gradient_
     """
     # number of training examples
     m = len(X)
-    
+
     # An array to store cost J and w's at each iteration primarily for graphing later
     J_history = []
     w = copy.deepcopy(w_in)  #avoid modifying global w within function
@@ -179,7 +175,7 @@ def gradient_descent(X, y, w_in, b_in, alpha, num_iters,cost_function, gradient_
         # Update Parameters using w, b, alpha and gradient
         w = w - alpha * dj_dw               
         b = b - alpha * dj_db               
-      
+
         # Save cost J at each iteration
         if i<100000:      # prevent resource exhaustion 
             J_history.append( cost_function(X, y, w, b))
@@ -187,7 +183,7 @@ def gradient_descent(X, y, w_in, b_in, alpha, num_iters,cost_function, gradient_
         # Print cost every at intervals 10 times or as many iterations if < 10
         if i% math.ceil(num_iters / 10) == 0:
             print(f"Iteration {i:4d}: Cost {J_history[-1]}   ")
-        
+
     return w, b, J_history, #return final w,b and J history for graphing
 
 ######################################################
@@ -196,18 +192,18 @@ def gradient_descent(X, y, w_in, b_in, alpha, num_iters,cost_function, gradient_
 
 
 def plot_data(X, y, ax):
-    
+
     # Find Indices of Positive and Negative Examples
     pos = y == 1
     neg = y == 0
     pos = pos.reshape(-1,)  #work with 1D or 1D y vectors
     neg = neg.reshape(-1,)
-    
+
     # Plot examples
     ax.scatter(X[pos, 0], X[pos, 1], marker='x', s=80, c = 'red', label="y=1")
     ax.scatter(X[neg, 0], X[neg, 1], marker='o', s=100, label="y=0", facecolors='none', edgecolors=dlblue,lw=3)
     ax.legend()
-    
+
     ax.figure.canvas.toolbar_visible = False
     ax.figure.canvas.header_visible = False
     ax.figure.canvas.footer_visible = False
@@ -247,7 +243,7 @@ class plt_one_addpt_onclick:
 
         axcalc   = plt.axes([0.1, 0.05, 0.35, 0.075])  #l,b,w,h
         axthresh = plt.axes([0.5, 0.05, 0.35, 0.075])  #l,b,w,h
-        
+
         self.fig = fig
         self.ax = [ax,axcalc,axthresh]
         self.x = x
@@ -260,7 +256,7 @@ class plt_one_addpt_onclick:
             self.bline = self.ax[0].plot(self.x, f_wb, color=dlorange,lw=1)
         else:
             self.aline = self.ax[0].plot(self.x, sigmoid(f_wb), color=dlblue)
-            
+
 
         self.cid = fig.canvas.mpl_connect('button_press_event', self.add_data)
         if self.logistic:
@@ -278,7 +274,7 @@ class plt_one_addpt_onclick:
         if event.inaxes == self.ax[0]:
             x_coord = event.xdata
             y_coord = event.ydata
-            
+
             if y_coord > 0.5:
                 self.ax[0].scatter(x_coord, 1, marker='x', s=80, c = 'red', label="y=1")
                 self.y = np.append(self.y,1)
@@ -314,15 +310,17 @@ class plt_one_addpt_onclick:
             self.w, self.b, _ = gradient_descent(self.x.reshape(-1,1), self.y.reshape(-1,1), 
                                                  self.w.reshape(-1,1), self.b, 0.1, it, 
                                                compute_cost_logistic_matrix, 
-                                               compute_gradient_logistic_matrix) 
+                                               compute_gradient_logistic_matrix)
             self.aline[0].remove()
             self.bline[0].remove()
             self.alegend.remove()
             xlim  = self.ax[0].get_xlim()
             x_hat = np.linspace(*xlim, 30)
             y_hat = sigmoid(np.matmul(x_hat.reshape(-1,1), self.w) + self.b)
-            self.aline = self.ax[0].plot(x_hat, y_hat, color=dlblue, 
-                                         label=f"y = sigmoid(z)")
+            self.aline = self.ax[0].plot(
+                x_hat, y_hat, color=dlblue, label="y = sigmoid(z)"
+            )
+
             f_wb = np.matmul(x_hat.reshape(-1,1), self.w) + self.b
             self.bline = self.ax[0].plot(x_hat, f_wb, color=dlorange, lw=1, 
                                          label=f"z = {np.squeeze(self.w):0.2f}x+({self.b:0.2f})")
@@ -460,7 +458,7 @@ def compute_cost_logistic(X, y, w, b):
         z_i = np.dot(X[i],w) + b
         f_wb_i = sigmoid(z_i)
         cost +=  -y[i]*np.log(f_wb_i) - (1-y[i])*np.log(1-f_wb_i)
-             
+
     cost = (1/m) * cost
     return cost
 
@@ -470,7 +468,7 @@ def plt_logistic_squared_error(X,y):
                          np.linspace(10, -20, 40))
     points = np.c_[wx.ravel(), by.ravel()]
     cost = np.zeros(points.shape[0])
-    
+
     for i in range(points.shape[0]):
         w,b = points[i]
         cost[i] = compute_cost_logistic_sq_err(X.reshape(-1,1), y, w, b)
@@ -498,7 +496,7 @@ def plt_logistic_cost(X,y):
                          np.linspace(0, -20, 40))
     points = np.c_[wx.ravel(), by.ravel()]
     cost = np.zeros(points.shape[0],dtype=np.longdouble)
-    
+
     for i in range(points.shape[0]):
         w,b = points[i]
         cost[i] = compute_cost_logistic(X.reshape(-1,1), y, w, b)
@@ -518,9 +516,9 @@ def plt_logistic_cost(X,y):
     ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     ax.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
-    
+
     ax = fig.add_subplot(1, 2, 2, projection='3d')
-    
+
     ax.plot_surface(wx, by, np.log(cost), alpha=0.6,cmap=cm.jet,)
 
     ax.set_xlabel('w', fontsize=16)
@@ -555,14 +553,9 @@ def soup_bowl():
 
     #Get the z value for a bowl-shaped cost function
     z=np.zeros((len(w), len(b)))
-    j=0
-    for x in w:
-        i=0
-        for y in b:
+    for j, x in enumerate(w):
+        for i, y in enumerate(b):
             z[i,j] = x**2 + y**2
-            i+=1
-        j+=1
-
     #Meshgrid used for plotting 3D functions
     W, B = np.meshgrid(w, b)
 
@@ -640,7 +633,7 @@ def plt_stationary(x_train, y_train):
     ax1 = fig.add_subplot(gs[0, 1])
     ax2 = fig.add_subplot(gs[1, :],  projection='3d')
     ax = np.array([ax0,ax1,ax2])
-    
+
     #setup useful ranges and common linspaces
     w_range = np.array([200-300.,200+300])
     b_range = np.array([50-300., 50+300])
@@ -672,7 +665,7 @@ def plt_stationary(x_train, y_train):
     cvline = ax[1].vlines(w0, ax[1].get_ylim()[0],b, lw=4, color=dlpurple, ls='dotted')
     ax[1].text(0.5,0.95,"Click to choose w,b",  bbox=dict(facecolor='white', ec = 'black'), fontsize = 10,
                 transform=ax[1].transAxes, verticalalignment = 'center', horizontalalignment= 'center')
-    
+
     #Surface plot of the cost function J(w,b)
     ax[2].plot_surface(tmp_w, tmp_b, z,  cmap = dlcm, alpha=0.3, antialiased=True)
     ax[2].plot_wireframe(tmp_w, tmp_b, z, color='k', alpha=0.1)
@@ -685,7 +678,7 @@ def plt_stationary(x_train, y_train):
     ax[2].set_zlabel("J(w, b)\n\n", rotation=90)
     plt.title("Cost(w,b) \n [You can rotate this figure]", size=12)
     ax[2].view_init(30, -120)
-        
+
     return(fig,ax, [cscat, chline, cvline])
 
 

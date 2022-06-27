@@ -167,7 +167,7 @@ class data_plot:
             ctot += c_p
             self.cost_items.extend((a,b))
         ctot = ctot/(len(self.x_train))
-        cstr = cstr[:-1] + f") = {ctot:0.2f}"
+        cstr = f"{cstr[:-1]}) = {ctot:0.2f}"
         ## todo.. figure out how to get this textbox to extend to the width of the subplot
         c = self.ax.text(0.05,0.02,cstr, transform=self.ax.transAxes, color=dlc["dlpurple"])
         self.cost_items.append(c)
@@ -301,10 +301,10 @@ class path:
 
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     """ truncates color map """
-    new_cmap = colors.LinearSegmentedColormap.from_list(
+    return colors.LinearSegmentedColormap.from_list(
         'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
-        cmap(np.linspace(minval, maxval, n)))
-    return new_cmap
+        cmap(np.linspace(minval, maxval, n)),
+    )
 
 def plt_prob(ax, w_out,b_out):
     """ plots a decision boundary but include shading to indicate the probability """

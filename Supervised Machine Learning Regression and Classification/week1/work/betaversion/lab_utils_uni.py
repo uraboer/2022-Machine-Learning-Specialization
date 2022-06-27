@@ -28,7 +28,7 @@ def plt_house_x(X, y,f_wb=None, ax=None):
 
     ax.set_title("Housing Prices")
     ax.set_ylabel('Price (in 1000s of dollars)')
-    ax.set_xlabel(f'Size (1000 sqft)')
+    ax.set_xlabel('Size (1000 sqft)')
     if f_wb is not None:
         ax.plot(X, f_wb,  c=dlblue, label="Our Prediction")
     ax.legend()
@@ -55,7 +55,7 @@ def mk_cost_lines(x,y,w,b, ax):
             addedbreak = True
         ctot += c_p
     ctot = ctot/(len(x))
-    cstr = cstr[:-1] + f") = {ctot:0.0f}"
+    cstr = f"{cstr[:-1]}) = {ctot:0.0f}"
     ax.text(0.15,0.02,cstr, transform=ax.transAxes, color=dlpurple)
 
 ##########
@@ -215,14 +215,9 @@ def soup_bowl():
 
     #Get the z value for a bowl-shaped cost function
     z=np.zeros((len(w), len(b)))
-    j=0
-    for x in w:
-        i=0
-        for y in b:
+    for j, x in enumerate(w):
+        for i, y in enumerate(b):
             z[i,j] = x**2 + y**2
-            i+=1
-        j+=1
-
     #Meshgrid used for plotting 3D functions
     W, B = np.meshgrid(w, b)
 
@@ -289,7 +284,7 @@ def plt_divergence(p_hist, J_hist, x_train,y_train):
     fig = plt.figure(figsize=(12,5))
     plt.subplots_adjust( wspace=0 )
     gs = fig.add_gridspec(1, 5)
-    fig.suptitle(f"Cost escalates when learning rate is too large")
+    fig.suptitle("Cost escalates when learning rate is too large")
     #===============
     #  First subplot
     #===============
@@ -370,9 +365,9 @@ def plt_gradients(x_train,y_train, f_compute_cost, f_compute_gradient):
     ax[0].set_ylabel('Cost')
     ax[0].set_xlabel('w')
 
+    fix_b = 100
     # plot lines for fixed b=100
     for tmp_w in [100,200,300]:
-        fix_b = 100
         dj_dw,dj_db = f_compute_gradient(x_train, y_train, tmp_w, fix_b )
         j = f_compute_cost(x_train, y_train, tmp_w, fix_b)
         add_line(dj_dw, tmp_w, j, 30, ax[0])
@@ -395,4 +390,5 @@ def plt_gradients(x_train,y_train, f_compute_cost, f_compute_gradient):
     ax[1].set_title('Gradient shown in quiver plot')
     Q = ax[1].quiver(X, Y, U, V, color_array, units='width', )
     ax[1].quiverkey(Q, 0.9, 0.9, 2, r'$2 \frac{m}{s}$', labelpos='E',coordinates='figure')
-    ax[1].set_xlabel("w"); ax[1].set_ylabel("b")
+    ax[1].set_xlabel("w")
+    ax[1].set_ylabel("b")

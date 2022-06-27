@@ -26,7 +26,7 @@ def plt_house_x(X, y,f_wb=None, ax=None):
 
     ax.set_title("Housing Prices")
     ax.set_ylabel('Price (in 1000s of dollars)')
-    ax.set_xlabel(f'Size (1000 sqft)')
+    ax.set_xlabel('Size (1000 sqft)')
     if f_wb is not None:
         ax.plot(X, f_wb,  c=dlblue, label="Our Prediction")
     ax.legend()
@@ -49,7 +49,7 @@ def mk_cost_lines(x,y,w,b, ax):
         cstr += f"{c_p_txt:0.0f} +"
         ctot += c_p
     ctot = ctot/(len(x))
-    cstr = cstr[:-1] + f") = {ctot:0.0f}"
+    cstr = f"{cstr[:-1]}) = {ctot:0.0f}"
     ax.text(0.15,0.02,cstr, transform=ax.transAxes, color=dlpurple)
     
     
@@ -58,11 +58,15 @@ def inbounds(a,b,xlim,ylim):
     ylow,yhigh = ylim
     ax, ay = a
     bx, by = b
-    if (ax > xlow and ax < xhigh) and (bx > xlow and bx < xhigh) \
-        and (ay > ylow and ay < yhigh) and (by > ylow and by < yhigh):
-        return(True)
-    else:
-        return(False)
+    return (
+        ax > xlow
+        and ax < xhigh
+        and bx > xlow
+        and bx < xhigh
+        and ay > ylow
+        and ay < yhigh
+        and (by > ylow and by < yhigh)
+    )
 
 from mpl_toolkits.mplot3d import axes3d
 def plt_contour_wgrad(x, y, hist, ax, w_range=[-100, 500, 5], b_range=[-500, 500, 5], 
@@ -110,7 +114,7 @@ def plt_contour_multi(x, y, w, b, ax, prange, p1, p2, title="", xlabel="", ylabe
             if p1 == 4: b_ij = px[i,j]
             if p2 <= 3: w_ij[p2] = py[i,j]
             if p2 == 4: b_ij = py[i,j]
-                
+
             z[i][j] = compute_cost(x, y, w_ij, b_ij )
     CS = ax.contour(px, py, z, contours, linewidths=2,
                    colors=[dlblue, dlorange, dldarkred, dlmagenta, dlpurple]) 
@@ -161,7 +165,7 @@ def plt_divergence(p_hist, J_hist, x_train,y_train):
     fig = plt.figure(figsize=(12,5))
     plt.subplots_adjust( wspace=0 )
     gs = fig.add_gridspec(1, 5)
-    fig.suptitle(f"Cost escalates when learning rate is too large")
+    fig.suptitle("Cost escalates when learning rate is too large")
     #===============
     #  First subplot
     #===============
@@ -195,7 +199,7 @@ def plt_divergence(p_hist, J_hist, x_train,y_train):
 
     ax = fig.add_subplot(gs[2:], projection='3d')
     ax.plot_surface(tmp_w, tmp_b, z,  alpha=0.3, color=dlblue)
-    ax.xaxis.set_major_locator(MaxNLocator(2)) 
+    ax.xaxis.set_major_locator(MaxNLocator(2))
     ax.yaxis.set_major_locator(MaxNLocator(2)) 
 
     ax.set_xlabel('w', fontsize=16)
@@ -205,7 +209,7 @@ def plt_divergence(p_hist, J_hist, x_train,y_train):
     # Customize the view angle 
     ax.view_init(elev=20., azim=-65)
     ax.plot(x, y, v,c=dlmagenta)
-    
+
     return
 
 # draw derivative line
@@ -242,9 +246,9 @@ def plt_gradients(x_train,y_train, f_compute_cost, f_compute_gradient):
     ax[0].set_ylabel('Cost')
     ax[0].set_xlabel('w')
 
+    fix_b = 100
     # plot lines for fixed b=100
     for tmp_w in [100,200,300]:
-        fix_b = 100
         dj_dw,dj_db = f_compute_gradient(x_train, y_train, tmp_w, fix_b )
         j = f_compute_cost(x_train, y_train, tmp_w, fix_b)
         add_line(dj_dw, tmp_w, j, 30, ax[0])
@@ -267,7 +271,8 @@ def plt_gradients(x_train,y_train, f_compute_cost, f_compute_gradient):
     ax[1].set_title('Gradient shown in quiver plot')
     Q = ax[1].quiver(X, Y, U, V, color_array, units='width', )
     qk = ax[1].quiverkey(Q, 0.9, 0.9, 2, r'$2 \frac{m}{s}$', labelpos='E',coordinates='figure')
-    ax[1].set_xlabel("w"); ax[1].set_ylabel("b")
+    ax[1].set_xlabel("w")
+    ax[1].set_ylabel("b")
 
 def norm_plot(ax, data):
     scale = (np.max(data) - np.min(data))*0.2
@@ -396,7 +401,7 @@ def compute_gradient(X, y, w, b):
     return dj_db,dj_dw
 
 #This version saves more values and is more verbose than the assigment versons
-def gradient_descent_houses(X, y, w_in, b_in, cost_function, gradient_function, alpha, num_iters): 
+def gradient_descent_houses(X, y, w_in, b_in, cost_function, gradient_function, alpha, num_iters):
     """
     Performs batch gradient descent to learn theta. Updates theta by taking 
     num_iters gradient steps with learning rate alpha
@@ -419,17 +424,21 @@ def gradient_descent_houses(X, y, w_in, b_in, cost_function, gradient_function, 
     
     # number of training examples
     m = len(X)
-    
+
     # An array to store values at each iteration primarily for graphing later
-    hist={}
-    hist["cost"] = []; hist["params"] = []; hist["grads"]=[]; hist["iter"]=[];
-    
+    hist = {"cost": [], "params": [], "grads": [], "iter": []}
     w = copy.deepcopy(w_in)  #avoid modifying global w within function
     b = b_in
     save_interval = np.ceil(num_iters/10000) # prevent resource exhaustion for long runs
 
-    print(f"Iteration Cost          w0       w1       w2       w3       b       djdw0    djdw1    djdw2    djdw3    djdb  ")
-    print(f"---------------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|")
+    print(
+        "Iteration Cost          w0       w1       w2       w3       b       djdw0    djdw1    djdw2    djdw3    djdb  "
+    )
+
+    print(
+        "---------------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|"
+    )
+
 
     for i in range(num_iters):
 
@@ -439,7 +448,7 @@ def gradient_descent_houses(X, y, w_in, b_in, cost_function, gradient_function, 
         # Update Parameters using w, b, alpha and gradient
         w = w - alpha * dj_dw               
         b = b - alpha * dj_db               
-      
+
         # Save cost J,w,b at each save interval for graphing
         if i == 0 or i % save_interval == 0:     
             hist["cost"].append(cost_function(X, y, w, b))
@@ -452,7 +461,7 @@ def gradient_descent_houses(X, y, w_in, b_in, cost_function, gradient_function, 
             #print(f"Iteration {i:4d}: Cost {cost_function(X, y, w, b):8.2f}   ")
             cst = cost_function(X, y, w, b)
             print(f"{i:9d} {cst:0.5e} {w[0]: 0.1e} {w[1]: 0.1e} {w[2]: 0.1e} {w[3]: 0.1e} {b: 0.1e} {dj_dw[0]: 0.1e} {dj_dw[1]: 0.1e} {dj_dw[2]: 0.1e} {dj_dw[3]: 0.1e} {dj_db: 0.1e}")
-       
+
     return w, b, hist #return w,b and history for graphing
 
 def run_gradient_descent(X,y,iterations=1000, alpha = 1e-6):
@@ -488,7 +497,7 @@ def run_gradient_descent_feng(X,y,iterations=1000, alpha = 1e-6):
     
     return(w_out, b_out)
 
-def gradient_descent(X, y, w_in, b_in, cost_function, gradient_function, alpha, num_iters): 
+def gradient_descent(X, y, w_in, b_in, cost_function, gradient_function, alpha, num_iters):
     """
     Performs batch gradient descent to learn theta. Updates theta by taking 
     num_iters gradient steps with learning rate alpha
@@ -511,11 +520,9 @@ def gradient_descent(X, y, w_in, b_in, cost_function, gradient_function, alpha, 
     
     # number of training examples
     m = len(X)
-    
+
     # An array to store values at each iteration primarily for graphing later
-    hist={}
-    hist["cost"] = []; hist["params"] = []; hist["grads"]=[]; hist["iter"]=[];
-    
+    hist = {"cost": [], "params": [], "grads": [], "iter": []}
     w = copy.deepcopy(w_in)  #avoid modifying global w within function
     b = b_in
     save_interval = np.ceil(num_iters/10000) # prevent resource exhaustion for long runs
@@ -528,7 +535,7 @@ def gradient_descent(X, y, w_in, b_in, cost_function, gradient_function, alpha, 
         # Update Parameters using w, b, alpha and gradient
         w = w - alpha * dj_dw               
         b = b - alpha * dj_db               
-      
+
         # Save cost J,w,b at each save interval for graphing
         if i == 0 or i % save_interval == 0:     
             hist["cost"].append(cost_function(X, y, w, b))
@@ -557,13 +564,10 @@ def zscore_normalize_features(X,rtn_ms=False):
     Returns
       X_norm: (numpy array (m,n)) input normalized by column
     """
-    mu     = np.mean(X,axis=0)  
+    mu     = np.mean(X,axis=0)
     sigma  = np.std(X,axis=0)
     X_norm = (X - mu)/sigma      
 
-    if rtn_ms:
-        return(X_norm, mu, sigma)
-    else:
-        return(X_norm)
+    return (X_norm, mu, sigma) if rtn_ms else X_norm
     
     

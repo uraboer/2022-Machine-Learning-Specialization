@@ -10,7 +10,7 @@ def sigmoid(x):
 def plot_mc_data(X, y, class_labels=None, legend=False,size=40):
     classes = np.unique(y)
     for i in classes:
-        label = class_labels[i] if class_labels else "class {}".format(i)
+        label = class_labels[i] if class_labels else f"class {i}"
         idx = np.where(y == i)
         plt.scatter(X[idx, 0], X[idx, 1],  cmap=plt.cm.Paired,
                     edgecolor='black', s=size, label=label)

@@ -13,7 +13,7 @@ def widgvis(fig):
     
 def plt_base(ax):
     X = np.linspace(0, 3, 3*100)
-    y = np.r_[ -2*X[0:100]+2, 1*X[100:200]-3+2, 3*X[200:300]-7+2 ]
+    y = np.r_[-2 * X[:100] + 2, 1*X[100:200]-3+2, 3*X[200:300]-7+2]
     w00 = -2
     b00 =  2
     w01 =  0  #  1
@@ -32,8 +32,7 @@ def plt_yhat(ax, X, w00, b00, w01, b01, w02, b02):
     yhat = np.maximum(0, np.dot(w00, X) + b00) + \
             np.maximum(0, np.dot(w01, X) + b01) + \
             np.maximum(0, np.dot(w02, X) + b02)
-    lp = ax.plot(X, yhat, lw=2, color = dlc["dlorange"], label="a2")
-    return(lp)
+    return ax.plot(X, yhat, lw=2, color = dlc["dlorange"], label="a2")
 
 def plt_unit(ax, X, w, b):
     z = np.dot(w,X) + b

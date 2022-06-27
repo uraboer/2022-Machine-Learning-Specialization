@@ -26,10 +26,10 @@ def plt_prob_1d(ax,fwb):
     
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     """ truncates color map """
-    new_cmap = colors.LinearSegmentedColormap.from_list(
+    return colors.LinearSegmentedColormap.from_list(
         'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
-        cmap(np.linspace(minval, maxval, n)))
-    return new_cmap
+        cmap(np.linspace(minval, maxval, n)),
+    )
 
 
 def sigmoidnp(z):
@@ -47,9 +47,7 @@ def sigmoidnp(z):
          sigmoid(z)
     """
     z = np.clip( z, -500, 500 )           # protect against overflow
-    g = 1.0/(1.0+np.exp(-z))
-
-    return g
+    return 1.0/(1.0+np.exp(-z))
 
 def plt_linear(X_train, Y_train, prediction_tf, prediction_np):
     fig, ax = plt.subplots(1,2, figsize=(16,4))
